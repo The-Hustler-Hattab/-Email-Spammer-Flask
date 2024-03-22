@@ -336,8 +336,19 @@ def send_sms_to_phone() -> tuple[Response, int]:
     is_mms = request_data.get('is_mms')
     message_count = request_data.get('message_count')
 
+    print(subject)
+
+    if not message_count:
+        message_count = 1
+    if not is_mms:
+        is_mms = False
+    if not subject:
+        subject = ''
+
+    print(message_count)
+
     # Check if all required fields are provided
-    if not from_email or not phone_number or not subject or not body or is_mms is None:
+    if not from_email or not phone_number or not body :
         return jsonify({'msg': 'Missing required fields'}), 400
 
     return EmailService.send_sms_to_phone(from_email, phone_number, subject, body, is_mms, message_count)
@@ -359,11 +370,11 @@ def send_sms_from_all() -> tuple[Response, int]:
           properties:
             phone_number:
               type: string
-            email_subject:
+            subject:
               type: string
-            email_body:
+            body:
               type: string
-            is_mime:
+            is_mms:
               type: boolean
             reword:
               type: boolean
@@ -379,11 +390,16 @@ def send_sms_from_all() -> tuple[Response, int]:
     # Extract data from JSON request body and ensure required fields are present
     request_data = request.json
     phone_number = request_data.get('phone_number')
-    email_subject = request_data.get('email_subject')
-    email_body = request_data.get('email_body')
-    is_mime = request_data.get('is_mime')
+    email_subject = request_data.get('subject')
+    email_body = request_data.get('body')
+    is_mime = request_data.get('is_mms')
     reword = request_data.get('reword')
     message_count: int = request_data.get('message_count')
+    if not email_subject:
+        email_subject = ''
+    if not reword:
+        reword = False
+
     # # Check if all required fields are provided
     if not email_body or not phone_number:
         return jsonify({'error': 'Missing required fields'}), 400

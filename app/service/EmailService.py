@@ -164,25 +164,24 @@ class EmailService:
         """
         Send an SMS to a phone
         """
-        for i in range(message_count):
-            try:
-                carrier_emails = WirelessCarrierEmailText.get_all_by_allow_multimedia(is_mms)
-                if not carrier_emails:
-                    return jsonify({'msg': f'Carrier email for {carrier_emails} not found.'}), 400
+        try:
+            carrier_emails = WirelessCarrierEmailText.get_all_by_allow_multimedia(is_mms)
+            if not carrier_emails:
+                return jsonify({'msg': f'Carrier email for {carrier_emails} not found.'}), 400
 
-                to_emails: list[str] = []
-                for carrier_email in carrier_emails:
-                    to_email = f"{phone_number}{carrier_email.domain}"
-                    email_res = EmailService.send_email(from_email, to_email, subject, body)
-                    print(f"email_res: `{email_res}`")
-                    if email_res[1] == 200:
-                        print(f"Email sent successfully to `{to_email}`")
-                        to_emails.append(to_email)
+            to_emails: list[str] = []
+            for carrier_email in carrier_emails:
+                to_email = f"{phone_number}{carrier_email.domain}"
+                email_res = EmailService.send_email(from_email, to_email, subject, body,message_count=message_count)
+                print(f"email_res: `{email_res}`")
+                if email_res[1] == 200:
+                    print(f"Email sent successfully to `{to_email}`")
+                    to_emails.append(to_email)
 
-                return jsonify({'msg': f'Sent SMS successfully to {to_emails}'}), 200
+            return jsonify({'msg': f'Sent SMS successfully to {to_emails}'}), 200
 
-            except Exception as e:
-                return jsonify({'msg': f'Failed to Send SMS due to {e}'}), 500
+        except Exception as e:
+            return jsonify({'msg': f'Failed to Send SMS due to {e}'}), 500
 
     @staticmethod
     def send_sms_from_all(receiver_email: str, subject: str, body: str, is_mime: bool = True, reword: bool = False,
