@@ -1,13 +1,21 @@
-# Use the official Python image as the base image
-FROM python:3.8-slim
+FROM python:3.11.3-slim-bullseye
+
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y gcc default-libmysqlclient-dev pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /workspace
 
 
 COPY requirements.txt requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+
+RUN pip install --upgrade pip \
+    && pip install mysqlclient \
+    && pip install -r requirements.txt
 
 # Copy the application code into the container
 COPY . .

@@ -1,9 +1,0 @@
-flask
-python-dotenv==1.0.1
-flask-cors
-flasgger==0.9.7.1
-gunicorn
-sqlalchemy
-mysql-connector-python
-openai==1.0.0
-

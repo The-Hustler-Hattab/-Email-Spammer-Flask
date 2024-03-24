@@ -1,11 +1,13 @@
+from functools import wraps
 from typing import Tuple, Dict
 
 from flask import jsonify, Response, request
 
-from app import app
+from app import app, oauth, verify_jwt
 from app.model.EmailCredsAlchemy import EmailCreds
 from app.model.WirelessCarrierEmailToTextAlchemy import WirelessCarrierEmailText
 from app.service.EmailService import EmailService
+
 
 
 @app.route('/health', methods=['GET'])
@@ -24,6 +26,7 @@ def health() -> Tuple[Dict[str, str], int]:
 
 
 @app.route('/initialize-email-connections', methods=['GET'])
+@verify_jwt
 def initialize_email_connections() -> tuple[Response, int]:
     """
     Initialize email connections
@@ -47,6 +50,7 @@ def initialize_email_connections() -> tuple[Response, int]:
 
 
 @app.route('/get-emails', methods=['GET'])
+@verify_jwt
 def get_all_emails() -> tuple[Response, int]:
     """
     Get All Emails inside the db.
@@ -64,6 +68,7 @@ def get_all_emails() -> tuple[Response, int]:
 
 
 @app.route('/get-email-carriers', methods=['GET'])
+@verify_jwt
 def get_email_carriers() -> tuple[Response, int]:
     """
     Get All Emails carriers inside the db.
@@ -81,6 +86,7 @@ def get_email_carriers() -> tuple[Response, int]:
 
 
 @app.route('/create-email', methods=['POST'])
+@verify_jwt
 def create_email() -> tuple[Response, int]:
     """
     Create a new email in the db
@@ -128,6 +134,7 @@ def create_email() -> tuple[Response, int]:
 
 
 @app.route('/create-wireless-carrier-email', methods=['POST'])
+@verify_jwt
 def create_wireless_carrier_email() -> tuple[Response, int]:
     """
     Create a new record in the wireless_carrier_email_text table
@@ -176,6 +183,7 @@ def create_wireless_carrier_email() -> tuple[Response, int]:
 
 
 @app.route('/delete-wireless-carrier-email/<int:id>', methods=['DELETE'])
+@verify_jwt
 def delete_wireless_carrier_email(id: int) -> tuple[Response, int]:
     """
     Delete a record from the wireless_carrier_email_text table by ID
@@ -208,6 +216,7 @@ def delete_wireless_carrier_email(id: int) -> tuple[Response, int]:
 
 
 @app.route('/send-email', methods=['POST'])
+@verify_jwt
 def send_email() -> tuple[Response, int]:
     """
     Create a new email in the db
@@ -253,6 +262,7 @@ def send_email() -> tuple[Response, int]:
 
 
 @app.route('/send-email-from-all', methods=['POST'])
+@verify_jwt
 def send_email_from_all() -> tuple[Response, int]:
     """
     Create a new email in the db
@@ -293,6 +303,7 @@ def send_email_from_all() -> tuple[Response, int]:
 
 
 @app.route('/send-sms', methods=['POST'])
+@verify_jwt
 def send_sms_to_phone() -> tuple[Response, int]:
     """
     Send an SMS to a phone
@@ -348,13 +359,14 @@ def send_sms_to_phone() -> tuple[Response, int]:
     print(message_count)
 
     # Check if all required fields are provided
-    if not from_email or not phone_number or not body :
+    if not from_email or not phone_number or not body:
         return jsonify({'msg': 'Missing required fields'}), 400
 
     return EmailService.send_sms_to_phone(from_email, phone_number, subject, body, is_mms, message_count)
 
 
 @app.route('/send_sms_from_all', methods=['POST'])
+@verify_jwt
 def send_sms_from_all() -> tuple[Response, int]:
     """
     Create a new email in the db
