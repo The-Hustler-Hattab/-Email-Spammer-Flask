@@ -37,7 +37,7 @@ OKTA_JWK_URL = app.config.get(Constants.OIDC_JWK_URL)
 
 
 def get_okta_public_keys():
-    response = requests.get(OKTA_JWK_URL)
+    response = requests.get(OKTA_JWK_URL, timeout=60)
     response.raise_for_status()
     return response.json()['keys']
 
