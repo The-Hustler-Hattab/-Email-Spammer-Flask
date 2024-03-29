@@ -1,3 +1,6 @@
 .env
 .history
 .idea
+app/__pycache__
+app/model/__pycache__
+app/service/__pycache__
