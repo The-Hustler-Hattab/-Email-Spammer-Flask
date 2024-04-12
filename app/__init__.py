@@ -1,6 +1,4 @@
 from functools import wraps
-
-import requests
 from authlib.jose import jwt
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
@@ -8,6 +6,7 @@ import os
 from flasgger import Swagger
 from flask_cors import CORS
 from authlib.integrations.flask_client import OAuth
+from security import safe_requests
 
 
 class Constants:
@@ -37,7 +36,7 @@ OKTA_JWK_URL = app.config.get(Constants.OIDC_JWK_URL)
 
 
 def get_okta_public_keys():
-    response = requests.get(OKTA_JWK_URL)
+    response = safe_requests.get(OKTA_JWK_URL)
     response.raise_for_status()
     return response.json()['keys']
 
@@ -71,7 +70,3 @@ def verify_jwt(f):
         return jsonify({'message': 'Invalid token'}), 401
 
     return decorated_function
-
-
-# Import routes after creating the app instance to avoid circular imports
-from app import routes
